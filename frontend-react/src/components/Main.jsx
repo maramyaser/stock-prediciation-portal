@@ -1,8 +1,12 @@
 import React from 'react'
 import Button from './Button'
+import Header from './Header'
+import Footer from './Footer'
+
 const Main = () => {
   return (
     <>
+    
     <div className='container'>
       <div className='p-5 text-center bg-light-dark rounded'>
          <h1 className='text-light'>Stock Predicition Portal</h1>
@@ -12,12 +16,9 @@ const Main = () => {
           predictive modeling, and a modern web interface to help users better understand potential market movements. By leveraging advanced 
           algorithms and real-time insights, the platform transforms complex stock data into clear, interactive visualizations.</p>
 
-         <Button text ='Login' class = "btn-outline-info"/>
-
+         <Button text='Explore Now' className='btn-outline-info' url='/dashboard'/>
       </div>
     </div>
-    
-    
     </>
   )
 }
