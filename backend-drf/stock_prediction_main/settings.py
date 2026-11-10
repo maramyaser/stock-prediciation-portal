@@ -139,3 +139,8 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 
 }
+
+#media files config
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
