@@ -1,45 +1,45 @@
-import React, {useContext} from 'react'
-import Button from './Button'
-import {Link, useNavigate} from 'react-router-dom'
-import {AuthContext} from '../AuthProvider'
+import { useContext, useState } from 'react'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { AuthContext } from '../AuthProvider'
 
-const Header = () => {
-  const {isLoggedIn, setIsLoggedIn} = useContext(AuthContext)
+export default function Header() {
+  const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext)
+  const [menuOpen, setMenuOpen] = useState(false)
   const navigate = useNavigate()
 
-  const handleLogout = () => {
+  function logout() {
     localStorage.removeItem('accessToken')
     localStorage.removeItem('refreshToken')
     setIsLoggedIn(false)
-    console.log('Logged out successfully')
+    setMenuOpen(false)
     navigate('/login')
-
   }
-  return (
-    <>
-    <nav className='navbar container pt-3 pd-3 align-items-start'>
-      <Link to='/' className='navbar-brand text-light'>Stock Predicition Portal</Link>
 
-      <div>
-        {isLoggedIn ? (
-          <>
-         <Button text='Dashboard' className='btn-info' url='/dashboard'/>
-          &nbsp;
-          <button className='btn btn-danger' onClick={handleLogout}>Logout</button>
-          </>
-        ) : (
-          <>
-            <Button text='Login' className='btn-outline-info' url='/login'/>
-            &nbsp;
-            <Button text='Register' className='btn-info' url='/register'/>
-          </>
-        )}
-      </div>
-      
-    </nav>    
-    
-    </>
+  return (
+    <header className="site-header">
+      <nav className="nav-shell" aria-label="Main navigation">
+        <Link className="brand" to="/" onClick={() => setMenuOpen(false)}>
+          <span className="brand-icon" aria-hidden="true">↗</span>
+          <span>stock<span className="brand-accent">wise</span><small className="brand-dot">.</small></span>
+        </Link>
+        <button className="mobile-toggle" type="button" aria-label="Toggle navigation" aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>☰</button>
+        <div className={`nav-links ${menuOpen ? 'is-open' : ''}`}>
+          <NavLink to="/" end onClick={() => setMenuOpen(false)}>Overview</NavLink>
+          {isLoggedIn && <NavLink to="/dashboard" onClick={() => setMenuOpen(false)}>Workspace</NavLink>}
+          <span className="nav-spacer" />
+          {isLoggedIn ? (
+            <>
+              <Link className="nav-cta" to="/dashboard" onClick={() => setMenuOpen(false)}>Open dashboard <span>↗</span></Link>
+              <button className="nav-logout" type="button" onClick={logout}>Log out</button>
+            </>
+          ) : (
+            <>
+              <Link className="nav-login" to="/login" onClick={() => setMenuOpen(false)}>Log in</Link>
+              <Link className="nav-cta" to="/register" onClick={() => setMenuOpen(false)}>Get started <span>↗</span></Link>
+            </>
+          )}
+        </div>
+      </nav>
+    </header>
   )
 }
-
-export default Header
