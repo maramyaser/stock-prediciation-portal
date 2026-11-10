@@ -1,71 +1,33 @@
-import React, {useState, useContext} from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
-import axios from 'axios'
-import {useNavigate} from 'react-router-dom'
-import {AuthContext} from '../AuthProvider'
+import { useState, useContext } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { AuthContext } from '../AuthProvider'
+import axiosInstance from '../axiosInstance'
 
-const Login = () => {
-   const [username, setUsername] = useState('')
-   const [password, setPassword] = useState('')
-   const [loading, setLoading] = useState(false)
-   const navigate = useNavigate()
-   const [error, setError] = useState('')
-   const {isLoggedIn, setIsLoggedIn} = useContext(AuthContext)
+export default function Login() {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const { setIsLoggedIn } = useContext(AuthContext)
+  const navigate = useNavigate()
 
-   const handleLogin = async (e) => {
-    e.preventDefault()
-     setLoading(true)
-     const userData = {username, password}
-     
-     try{
-      const response = await axios.post('http://127.0.0.1:8000/api/v1/token/', userData)
+  async function handleLogin(event) {
+    event.preventDefault()
+    setLoading(true)
+    setError('')
+    try {
+      const response = await axiosInstance.post('/token/', { username, password })
       localStorage.setItem('accessToken', response.data.access)
       localStorage.setItem('refreshToken', response.data.refresh)
-      console.log('Login successful')
       setIsLoggedIn(true)
       navigate('/dashboard')
-
-    }catch(error){
-      console.error('Invalid credentials:')
-      setError('Invalid username or password')
-    }finally{
+    } catch {
+      setError('Unable to sign in. Check your username and password.')
+    } finally {
       setLoading(false)
     }
-   }
-   
-  return (
-    <>
-      <div className='container'>
-      <div className='row justify-content-center'>
-        <div className='col-md-6 bg-light-dark p-5 rounded mt-5'>
-          <h3 className='text-light text-center'>Login to Portal</h3>
-          <form onSubmit={handleLogin}>
-            <div className='mb-3'>
-             <input type='text' className='form-control' placeholder='Username' value={username} onChange={(e) => setUsername(e.target.value)}/>
-            </div>
-             
-             <div className='mb-3'>
-               <input type='password' className='form-control' placeholder='Set Password' value={password} onChange={(e) => setPassword(e.target.value)}/>
-             </div>
-              {error && <div className='text-danger'>{error}</div>}
-              
-             {loading ? (
-              <button type='submit' className='btn btn-info d-block mx-auto' disabled><FontAwesomeIcon icon={faSpinner} spin /> Logging in...</button>
-              ) : (
-              <button type='submit' className='btn btn-primary d-block mx-auto'>Login</button>
-              )}
-             </form>
-             
-        </div>
+  }
 
-      </div>
-
-     </div>
-
-
-    </>
-  )
+  return <main className="auth-page page-shell"><div className="auth-aside"><span className="section-kicker">WELCOME BACK</span><h1>Your next insight <em>starts here.</em></h1><p>Stay on top of your research with a workspace made for the way you think.</p><div className="auth-decoration">↗<span>FOLLOW THE SIGNAL</span></div></div><div className="auth-card"><div className="auth-card-top"><span className="auth-symbol">✳</span><span className="section-kicker">MEMBER ACCESS</span></div><h2>Sign in</h2><p className="auth-subtitle">Welcome back. Enter your details to continue.</p><form onSubmit={handleLogin} className="auth-form"><label htmlFor="login-username">Username</label><input id="login-username" autoComplete="username" placeholder="Your username" required value={username} onChange={e => setUsername(e.target.value)} /><label htmlFor="login-password">Password</label><div className="password-field"><input id="login-password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" placeholder="Enter password" required value={password} onChange={e => setPassword(e.target.value)} /><button type="button" onClick={() => setShowPassword(!showPassword)}>{showPassword ? 'Hide' : 'Show'}</button></div>{error && <p className="form-error" role="alert">{error}</p>}<button className="button button-primary auth-submit" type="submit" disabled={loading}>{loading ? 'Signing in…' : 'Sign in'} <span>↗</span></button></form><p className="auth-switch">New here? <Link to="/register">Create an account</Link></p></div></main>
 }
-
-export default Login
